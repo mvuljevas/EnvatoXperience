@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
     hideDeprecated: false,
   });
 
+  let contextRevision = 0;
   let currentImageObjectUrl = null;
   let settingsState = { ...defaultSettings };
 
@@ -506,7 +507,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function renderProductDetails(activeTab, details) {
+  function renderProductDetails(activeTab, details, revision) {
     hideContextState();
 
     if (productTitleText) productTitleText.textContent = details.title;
@@ -516,6 +517,7 @@ document.addEventListener("DOMContentLoaded", function () {
       details.itemId || (shared ? shared.extractItemIdFromUrl(activeTab.url) : null);
 
     const renderUI = (finalImageUrl) => {
+      if (revision !== contextRevision) return;
       const priceEl = document.getElementById("itemDetailsPrice");
       const salesEl = document.getElementById("itemDetailsSales");
       const ratingEl = document.getElementById("itemDetailsRating");
@@ -550,8 +552,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function checkDomain() {
+    const revision = ++contextRevision;
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      if (!tabs || tabs.length === 0) return;
+      if (revision !== contextRevision || !tabs || tabs.length === 0) return;
 
       const activeTab = tabs[0];
       const isEnvatoPreview =
@@ -590,7 +593,8 @@ document.addEventListener("DOMContentLoaded", function () {
           activeTab.id,
           { action: "get_product_info" },
           function (response) {
-            if (chrome.runtime.lastError) return;
+            const messageError = chrome.runtime.lastError;
+            if (revision !== contextRevision || messageError) return;
 
             if (response && response.title) {
               renderContextState({
@@ -624,7 +628,9 @@ document.addEventListener("DOMContentLoaded", function () {
           activeTab.id,
           { action: "get_item_details" },
           function (response) {
-            if (chrome.runtime.lastError) {
+            const messageError = chrome.runtime.lastError;
+            if (revision !== contextRevision) return;
+            if (messageError) {
               renderContextState({
                 eyebrow: "Product context unavailable",
                 title: "We could not load this item",
@@ -640,7 +646,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 response && typeof response === "object" ? response : null;
 
               if (details && details.title) {
-                renderProductDetails(activeTab, details);
+                renderProductDetails(activeTab, details, revision);
               } else {
                 renderContextState({
                   eyebrow: "Product context available",
