@@ -32,7 +32,15 @@
   ]);
 
   function includesKnownHost(input, hosts) {
-    return typeof input === "string" && hosts.some((host) => input.includes(host));
+    if (typeof input !== "string" || !input) return false;
+    try {
+      const parsed = new URL(input.includes("://") ? input : `https://${input}`);
+      if (!["http:", "https:"].includes(parsed.protocol)) return false;
+      const hostname = parsed.hostname.toLowerCase().replace(/\.$/, "");
+      return hosts.some((host) => hostname === host || hostname.endsWith(`.${host}`));
+    } catch (error) {
+      return false;
+    }
   }
 
   function extractItemIdFromUrl(url = global.location?.href || "") {
