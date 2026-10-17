@@ -246,3 +246,7 @@ Registro corto de cambios relevantes para evitar pérdida de contexto entre sesi
 ### 2026-10-17 - Downloads observer lifecycle
 - Cambio: desconexión de observadores al desactivar Hide Removed Items y guardia contra callbacks pendientes.
 - Validación: regresión Node de desactivación, espera de lista y reactivación. La restauración visual sigue a cargo del CSS existente.
+
+### 2026-10-17 - Product context request ordering
+- Cambio: revisión de contexto por consulta; respuestas de pestañas, metadata e imágenes obsoletas se descartan.
+- Validación: prueba Node con respuestas resueltas fuera de orden y actualización correcta del último producto.
