@@ -250,3 +250,9 @@ Registro corto de cambios relevantes para evitar pérdida de contexto entre sesi
 ### 2026-10-17 - Product context request ordering
 - Cambio: revisión de contexto por consulta; respuestas de pestañas, metadata e imágenes obsoletas se descartan.
 - Validación: prueba Node con respuestas resueltas fuera de orden y actualización correcta del último producto.
+
+### 2026-10-17 - Deterministic regression coverage and CI
+- Cambio: comandos npm para regresiones Node y Chromium, fixtures locales sin credenciales, perfiles temporales y workflow de GitHub Actions.
+- Archivos: `scripts/*test.cjs`, `scripts/extension-regression.spec.cjs`, `scripts/playwright.regression.config.cjs`, `package.json`, `.github/workflows/regression.yml`, `README.md`, `docs/WORKFLOW.md`.
+- Validación: 3 pruebas Node y 4 pruebas Chromium aprobadas; redirección automática/manual, límites de widget, continuidad en cuatro subrutas y restauración/reactivación de descargas.
+- Limitaciones: smoke autenticado contra Envato real y ejecución de CI remoto pendientes. Resultados locales en `test-results/` ignorado por Git; perfiles temporales eliminados automáticamente.
