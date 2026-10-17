@@ -242,3 +242,7 @@ Registro corto de cambios relevantes para evitar pérdida de contexto entre sesi
 ### 2026-10-17 - Exact domain boundaries
 - Cambio: matching por hostname y límite de subdominio; widget limitado al hostname de destino exacto.
 - Validación: regresiones Node para hosts reales, dominios parecidos, credenciales y rutas engañosas.
+
+### 2026-10-17 - Downloads observer lifecycle
+- Cambio: desconexión de observadores al desactivar Hide Removed Items y guardia contra callbacks pendientes.
+- Validación: regresión Node de desactivación, espera de lista y reactivación. La restauración visual sigue a cargo del CSS existente.
