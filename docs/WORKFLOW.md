@@ -89,3 +89,7 @@ Para evitar colapsos de contexto durante sesiones largas, cada iteración debe d
 5. **Artefactos temporales**:
    - Si se usan snapshots visuales, logs o resultados de smoke, deben conservarse solo mientras aporten valor a la iteración.
    - No acumular basura temporal en el repo.
+
+## 5. Regresiones deterministas
+
+Ejecutar `npm test` para límites de dominio, ciclo de observadores y respuestas fuera de orden. Ejecutar `npm run test:extension:regression` para navegación automática/manual, widget, continuidad de metadata y toggle de Removed Items en Chromium con fixtures locales y perfil temporal aislado. Estas pruebas no sustituyen el smoke autenticado contra Envato real.

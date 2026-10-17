@@ -3,7 +3,9 @@
   "private": true,
   "scripts": {
     "smoke:extension": "playwright test --config=scripts/playwright.extension.config.cjs",
-    "smoke:extension:headed": "playwright test --config=scripts/playwright.extension.config.cjs --headed"
+    "smoke:extension:headed": "playwright test --config=scripts/playwright.extension.config.cjs --headed",
+    "test": "node --test scripts/*.test.cjs",
+    "test:extension:regression": "playwright test --config=scripts/playwright.regression.config.cjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2"

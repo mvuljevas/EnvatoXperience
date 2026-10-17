@@ -405,7 +405,7 @@ function checkAndInjectWidget() {
       // Check if context is fresh (e.g. within 2 hours)
       const isFresh = (Date.now() - info.timestamp) < (2 * 60 * 60 * 1000);
       
-      if (isFresh && window.location.hostname.includes(info.targetDomain)) {
+      if (isFresh && window.location.hostname === info.targetDomain) {
         injectWidget(info);
       }
     }

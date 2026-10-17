@@ -18,7 +18,7 @@ A Chrome extension that enhances the Envato browsing experience with cleaner pre
 - **Local Image Cache**: Stores product hero images in `IndexedDB` with TTL and eviction rules instead of bloating extension storage.
 - **Contextual Status States**: Outside item pages, the panel switches to premium editorial states for browse, preview, and fallback contexts instead of showing a dead loading message.
 - **Compact Product Card**: The sidepanel now renders a tighter, Envato-inspired product card with title, author, category, price, sales, rating, last update, and direct live preview access.
-- **Support Section**: The Admin tab includes a lightweight funding card with GitHub Sponsors, Buy Me a Coffee, and PayPal support options for independent development.
+- **Support Section**: The Admin tab includes a lightweight funding card with GitHub Sponsors, Ko-fi, and PayPal support options for independent development.
 - **Smart Detection**: Specifically extracts product metadata from Envato domains and targets the `.full-screen-preview__frame` container safely.
 - **Shadow DOM Isolation**: The UI and floating widgets are strictly encapsulated in Shadow DOM to avoid CSS bleeding onto any theme's complex stylesheets.
 
@@ -131,3 +131,16 @@ Crafted by [Mauricio Vuljevas](https://www.mvuljevas.com?utm_source=envatoxperie
 ## License
 
 MIT License.
+
+### Deterministic regression checks
+
+```bash
+npm ci
+npm test
+npx playwright install chromium
+npm run test:extension:regression
+```
+
+The regression suite uses an isolated temporary Chromium profile and locally fulfilled pages, without Envato credentials. It covers automatic and manual preview navigation, widget destination boundaries, product context across item subpages, and removed-item toggles. Node tests cover domain lookalikes, observer lifecycle, and responses arriving out of order. The existing live smoke remains necessary to check Envato selectors and authenticated downloads against the real website.
+
+Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` only when using an existing compatible Chromium executable. Temporary browser profiles are removed after the run; test output stays under the ignored `test-results/` directory.

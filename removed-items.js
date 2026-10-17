@@ -245,6 +245,7 @@
   }
 
   function injectRemovedBars() {
+    if (document.documentElement.dataset.envatoHideDeprecated !== "true") return;
     const deprecatedItems = document.querySelectorAll(
       "li.download:has(.download__unavailable)",
     );
@@ -366,6 +367,11 @@
     if (enabled) {
       connectDownloadsObserver();
       injectRemovedBars();
+    } else {
+      downloadsObserver?.disconnect();
+      downloadsObserver = null;
+      downloadsListObserver?.disconnect();
+      downloadsListObserver = null;
     }
   }
 
