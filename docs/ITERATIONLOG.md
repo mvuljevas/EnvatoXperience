@@ -212,3 +212,29 @@ Registro corto de cambios relevantes para evitar pérdida de contexto entre sesi
 - Validación: revisión directa de las referencias actualizadas.
 - Riesgos pendientes: el path local del workspace puede seguir llamándose `noframevato` hasta que se renombre físicamente la carpeta en disco.
 - Próximo paso lógico: decidir si el branding visible del producto debe unificarse también entre `XPerience` y `Xperience` en manifiesto, UI y documentación.
+
+### 2026-10-16 - Simplify Support copy
+- Objetivo: usar una invitación breve y neutral a colaborar.
+- Archivos: `sidepanel.html`.
+- Cambios: se reemplazó el texto sobre dificultades financieras por una invitación a apoyar este y otros proyectos.
+- Validación: diff revisado; sin cambios de estructura o comportamiento.
+- Pendiente: revisión visual del texto en Settings > Support tras reabrir el panel.
+
+### 2026-10-16 - Ko-fi support link
+- Objetivo: reemplazar Buy Me a Coffee por Ko-fi.
+- Archivos: `sidepanel.html`, `sidepanel.css`, `assets/icons/`, `README.md`.
+- Cambios: nuevo enlace a `https://ko-fi.com/mvuljevas`, SVG provisto por el autor con proporción horizontal y nombre accesible; se retiró el icono anterior.
+- Validación: SVG parseado, copia verificada y diff sin errores de espacios.
+- Pendiente: revisar visualmente Settings > Support al reabrir el panel.
+
+### 2026-10-16 - PayPal support wordmark
+- Objetivo: unificar la presentación de PayPal y Ko-fi.
+- Archivos: `assets/icons/icon-paypal.svg`, `sidepanel.html`, `sidepanel.css`.
+- Cambios: SVG de PayPal provisto por el autor, altura de 20px como Ko-fi y ancho proporcional; nombre accesible en la imagen y eliminación del texto duplicado.
+- Validación: SVG parseado, proporciones y diff revisados.
+- Pendiente: revisión visual en Settings > Support al reabrir el panel.
+
+### 2026-10-17 - PayPal.me support URL
+- Cambio: actualizado el enlace de PayPal en `sidepanel.html` a `https://www.paypal.com/paypalme/mvuljevas`.
+- Validación: enlace del botón comprobado y diff sin errores de formato.
+- Pendiente: comprobar la navegación desde el panel.
