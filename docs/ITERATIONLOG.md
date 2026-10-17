@@ -238,3 +238,7 @@ Registro corto de cambios relevantes para evitar pérdida de contexto entre sesi
 - Cambio: actualizado el enlace de PayPal en `sidepanel.html` a `https://www.paypal.com/paypalme/mvuljevas`.
 - Validación: enlace del botón comprobado y diff sin errores de formato.
 - Pendiente: comprobar la navegación desde el panel.
+
+### 2026-10-17 - Exact domain boundaries
+- Cambio: matching por hostname y límite de subdominio; widget limitado al hostname de destino exacto.
+- Validación: regresiones Node para hosts reales, dominios parecidos, credenciales y rutas engañosas.
