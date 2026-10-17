@@ -131,3 +131,16 @@ Crafted by [Mauricio Vuljevas](https://www.mvuljevas.com?utm_source=envatoxperie
 ## License
 
 MIT License.
+
+### Deterministic regression checks
+
+```bash
+npm ci
+npm test
+npx playwright install chromium
+npm run test:extension:regression
+```
+
+The regression suite uses an isolated temporary Chromium profile and locally fulfilled pages, without Envato credentials. It covers automatic and manual preview navigation, widget destination boundaries, product context across item subpages, and removed-item toggles. Node tests cover domain lookalikes, observer lifecycle, and responses arriving out of order. The existing live smoke remains necessary to check Envato selectors and authenticated downloads against the real website.
+
+Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` only when using an existing compatible Chromium executable. Temporary browser profiles are removed after the run; test output stays under the ignored `test-results/` directory.
