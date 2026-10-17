@@ -818,11 +818,13 @@ button.main-action:active {
 }
 
 .support-button-icon-paypal {
-  color: #0070ba;
+  height: 20px;
+  width: 75px;
 }
 
-.support-button-icon-coffee {
-  color: #ff813f;
+.support-button-icon-kofi {
+  height: 20px;
+  width: 73px;
 }
 
 /* Switch Styling */
