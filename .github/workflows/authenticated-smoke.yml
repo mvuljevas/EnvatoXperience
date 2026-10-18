@@ -1,0 +1,34 @@
+name: Private authenticated smoke
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: private-authenticated-smoke
+  cancel-in-progress: false
+jobs:
+  authenticated:
+    if: github.repository == 'mvuljevas/EnvatoXperience' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: envato-auth-smoke
+    env:
+      AUTH_SMOKE_ROOT: ${{ runner.temp }}/envato-auth-smoke
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts
+      - run: npx --no-install playwright install --with-deps chromium
+      - name: Check authenticated downloads privately
+        run: node scripts/auth-smoke.cjs
+        env:
+          ENVATO_TEST_USERNAME: ${{ secrets.ENVATO_TEST_USERNAME }}
+          ENVATO_TEST_PASSWORD: ${{ secrets.ENVATO_TEST_PASSWORD }}
+      - name: Remove private browser data
+        if: always()
+        shell: bash
+        run: rm -rf -- "$AUTH_SMOKE_ROOT"
