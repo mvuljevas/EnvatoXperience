@@ -84,7 +84,7 @@ What it does:
 - uses a standard persistent profile directory at `.playwright/chrome-extension-dev`
 - opens the floating panel through a small DOM test bridge in `content.js`
 - validates `Hide Ads` on supported item, browse, and `top-sellers` pages
-- validates authenticated account/download views using `/.env.local`, including fallback navigation through the user popover when needed
+- keeps authenticated checks in the separate protected manual workflow described below
 
 Useful overrides:
 - `PLAYWRIGHT_EXTENSION_PROFILE_DIR`: reuse an existing Chrome/Chromium dev profile instead of the default local profile
@@ -93,7 +93,7 @@ Useful overrides:
 - `SMOKE_TOP_SELLERS_URL`: override the browse/top-sellers smoke URL
 
 Notes:
-- The baseline smoke currently passes `item page`, `top-sellers`, and authenticated `downloads`.
+- The public live smoke covers `item page` and `top-sellers`; authenticated downloads use the private runner.
 - Reusing a real Chrome profile works only when Chrome is not already holding the same root user-data directory lock.
 
 ### File Structure
@@ -107,7 +107,7 @@ envato-xperience/
 ├── marketplace-overrides.css # Early ad-suppression rules for Envato pages
 ├── package.json        # Local Playwright smoke tooling entrypoints
 ├── scripts/            # Playwright extension smoke config/spec
-├── .env.local.example  # Local Playwright auth template for manual DOM debugging
+├── .env.local.example  # Reference names; CI secrets are entered directly in GitHub
 ├── content.js          # Preview, widget, and panel bridge logic
 ├── removed-items.js    # Removed/unavailable downloads UI enhancement
 ├── content.css         # Container styles
@@ -141,7 +141,7 @@ npx playwright install chromium
 npm run test:extension:regression
 ```
 
-The regression suite uses an isolated temporary Chromium profile and locally fulfilled pages, without Envato credentials. It covers automatic and manual preview navigation, widget destination boundaries, product context across item subpages, and removed-item toggles. Node tests cover domain lookalikes, observer lifecycle, and responses arriving out of order. The existing live smoke remains necessary to check Envato selectors and authenticated downloads against the real website.
+The regression suite uses an isolated temporary Chromium profile and locally fulfilled pages, without Envato credentials. It covers automatic and manual preview navigation, widget destination boundaries, product context across item subpages, and removed-item toggles. Node tests cover domain lookalikes, observer lifecycle, and responses arriving out of order. The public live smoke checks real Envato selectors; the separate protected manual workflow checks authenticated downloads.
 
 Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` only when using an existing compatible Chromium executable. Temporary browser profiles are removed after the run; test output stays under the ignored `test-results/` directory.
 
@@ -156,3 +156,7 @@ The extension uses stable SemVer `X.Y.Z`. `package.json` is the version source, 
 These commands update files without creating a Git commit or tag. Run them on the release feature branch, review the diff, run `npm test` and the extension regressions, then commit and merge into `develop` before merging into `main`. `npm run version:check` also runs in CI through `npm test` and rejects mismatches.
 
 Chrome-compatible versions use exactly three numeric components, each between 0 and 65535, without leading zeroes, prerelease/build suffixes, or `0.0.0`. Reload the extension and refresh its host tab to see a new version in Settings > About.
+
+### Authenticated checks in a public repository
+
+Authenticated downloads are tested only through the manual **Private authenticated smoke** workflow on `main`, behind the `envato-auth-smoke` environment approval. Add `ENVATO_TEST_USERNAME` and `ENVATO_TEST_PASSWORD` directly as environment secrets in GitHub, using a dedicated account. No authenticated screenshots, reports, traces or profiles are published. See [setup, protections and limitations](docs/AUTHENTICATED_SMOKE.md).

@@ -265,3 +265,10 @@ Registro corto de cambios relevantes para evitar pérdida de contexto entre sesi
 - Smoke real: top sellers aprobado; apertura del panel aprobada tras corregir una carrera en el helper de tests, en rama y commit separados (`feature/smoke-frame-wait`). Downloads autenticado sigue sin validar: el formulario esperado no aparece y locator.fill agota 15 segundos incluso con plazo global ampliado. No se asume éxito ni se omite esa prueba.
 - Artefactos: reporte local en `output/playwright/extension-smoke/report/`; resultados en `test-results/`, ambos ignorados por Git. Perfiles de regresión temporales eliminados automáticamente.
 - Próximo paso: comprobar CI de 1.1.0, recargar extensión y validar el login real para completar smoke de descargas.
+
+### 2026-10-17 - Protected manual authenticated smoke
+- Cambio: workflow manual solo main con entorno protegido, dependencias sin secretos, runner privado con logs descartados, orígenes de login revisados, perfil temporal y cleanup redundante. El smoke general deja de cargar credenciales y probar descargas autenticadas.
+- Archivos: `.github/workflows/authenticated-smoke.yml`, `scripts/auth-smoke.cjs`, `scripts/auth-smoke.test.cjs`, `scripts/extension-smoke.spec.cjs`, `README.md`, `docs/AUTHENTICATED_SMOKE.md`, `docs/COMPLIANCE.md`, `docs/WORKFLOW.md`.
+- Auditoría: 217 blobs históricos alcanzables desde origin comparados con secretos locales sin imprimir valores; sin coincidencias. Rutas .env/perfiles ausentes de origin; existe un perfil en stash local, no publicado.
+- Validación: 10 pruebas Node y 4 regresiones Chromium aprobadas; rechazo de orígenes, aislamiento de entorno, supresión de errores, resultados de timeout y cleanup. Entorno remoto configurado y releído: reviewer mvuljevas, bypass desactivado y política de rama main únicamente. No se ejecuta login real ni se cargan secretos por chat.
+- Pendiente: autor debe cargar environment secrets de cuenta dedicada y aprobar una ejecución para validar el login real.
