@@ -24,7 +24,7 @@ La herramienta está estructurada pura y netamente para Manifest V3. El flujo de
    - Abre una sub-vista `Settings` desde un botón de tuerca ubicado al bottom de `Admin`, reservando allí superficies secundarias como `About` y `Support`.
 - `assets/`: Carpeta de assets del panel/UI separada en `fonts/`, `images/` e `icons/`.
 - `image-cache.js`: Gestiona el caché local de imágenes en `IndexedDB` para evitar inflar `chrome.storage.local`.
-- `.env.local.example`: Plantilla local para pruebas autenticadas con Playwright. Usa `ENVATO_TEST_USERNAME`, `ENVATO_TEST_PASSWORD` y `ENVATO_ACCOUNT_URL`.
+- `.env.local.example`: Referencia de nombres `ENVATO_TEST_USERNAME` y `ENVATO_TEST_PASSWORD`; CI los recibe desde el entorno protegido. El runner no carga archivos .env.
 - `scripts/playwright.extension.config.cjs` + `scripts/extension-smoke.spec.cjs`: smoke runner local de la extensión usando Playwright y un perfil persistente reutilizable.
 
 ## 2. Pruebas y Desarrollo Local
@@ -44,7 +44,7 @@ Dado el entorno de las Extensiones de Chrome, no hay un `npm run dev` nativo o l
    - una sub-vista de producto (`reviews`, `comments` o `support`) para confirmar continuidad de metadata e imagen
    - una página de browse/categoría para confirmar que el panel muestre un estado contextual y no un loading muerto
    - una página con promos soportadas para confirmar que `Hide Ads` no deja huecos ni flicker visible
-9. Si necesitas inspección autenticada del DOM real en páginas de cuenta o `downloads`, usa `/.env.local` basado en `.env.local.example`. No trackear credenciales en git.
+9. Para validar descargas autenticadas, usar el workflow manual protegido descrito en `AUTHENTICATED_SMOKE.md`. El smoke general no carga `.env.local`. Nunca trackear credenciales, cookies ni perfiles en Git.
 10. Si quieres un smoke repetible de la extensión completa, usa:
    ```bash
    npm install
@@ -99,3 +99,7 @@ Ejecutar `npm test` para límites de dominio, ciclo de observadores y respuestas
 La fuente es `package.json`; usar `npm run release:patch`, `release:minor` o `release:major` según corrección compatible, nueva funcionalidad compatible o cambio incompatible. El hook npm `version` sincroniza el manifiesto; npm mantiene el lockfile. About lee la versión del manifiesto en runtime. No editar versiones a mano ni repetir el literal en HTML.
 
 Los comandos no crean commits ni tags. Revisar cambios, ejecutar `npm test` y regresiones de extensión, hacer commit en la rama funcional, integrar a `develop` y finalmente a `main`. CI valida coherencia y formato estable X.Y.Z compatible con Chrome.
+
+## 7. Smoke autenticado protegido
+
+El smoke general ya no carga `.env.local` ni ejecuta descargas autenticadas. Usar únicamente el workflow manual `Private authenticated smoke` sobre main y el entorno protegido `envato-auth-smoke`. Cargar credenciales de una cuenta de pruebas directamente como environment secrets en GitHub. Ver `AUTHENTICATED_SMOKE.md`; no publicar capturas, perfiles ni diagnósticos del login.

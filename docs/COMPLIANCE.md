@@ -45,3 +45,7 @@
    - the redirected target site
 4. Ensure the Chrome Web Store listing explains why broad host access is required.
 5. Link a public privacy/disclosure page from the listing or homepage.
+
+## Authenticated test data
+
+Public CI uses synthetic fixtures without credentials. Real-account tests are isolated in a manual workflow restricted to main with protected-environment approval. Credentials exist only in environment secrets and the private process environment; browser profiles are temporary, diagnostics suppressed, and no authenticated artifacts are uploaded. See `AUTHENTICATED_SMOKE.md` for setup, origin restrictions, cleanup and limitations.
