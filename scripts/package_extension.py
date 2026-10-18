@@ -10,6 +10,7 @@ RUNTIME_FILES = (
     'manifest.json', 'background.js', 'envato-shared.js', 'marketplace-init.js',
     'marketplace-overrides.css', 'image-cache.js', 'removed-items.js', 'content.js',
     'content.css', 'sidepanel.html', 'sidepanel.css', 'sidepanel.js', 'LICENSE',
+    'THIRD_PARTY_NOTICES.md', 'assets/fonts/OFL.txt',
     'icons/icon16.png', 'icons/icon48.png', 'icons/icon128.png',
     'assets/fonts/Oswald-Light.ttf', 'assets/fonts/Oswald-Regular.ttf',
     'assets/fonts/Oswald-Medium.ttf', 'assets/fonts/Oswald-SemiBold.ttf',

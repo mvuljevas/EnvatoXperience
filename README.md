@@ -54,6 +54,6 @@ You can also explore [my other projects](https://github.com/mvuljevas). Support 
 
 ## Open source
 
-Released under the [MIT License](LICENSE). Contributions are welcome; see the [contributor guide](CONTRIBUTING.md). Technical documentation lives in [docs](docs/DEVELOPMENT.md).
+Source code is released under the [MIT License](LICENSE); bundled materials have [third-party notices](THIRD_PARTY_NOTICES.md). Contributions are welcome; see the [contributor guide](CONTRIBUTING.md). Technical documentation lives in [docs](docs/DEVELOPMENT.md).
 
 Envato XPerience is an independent project, not affiliated with or endorsed by Envato. Envato and marketplace names belong to their respective owners.
