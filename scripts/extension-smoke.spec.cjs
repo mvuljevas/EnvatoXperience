@@ -46,6 +46,9 @@ let serviceWorker;
 test.beforeAll(async () => {
   context = await chromium.launchPersistentContext(smokeConfig.userDataDir, {
     channel: smokeConfig.browserChannel,
+    ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE
+      ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE }
+      : {}),
     headless: smokeConfig.headless,
     viewport: smokeConfig.viewport,
     args: [
@@ -227,14 +230,11 @@ async function waitForPanelFrame(page, currentExtensionId) {
     return Boolean(host?.shadowRoot?.querySelector("iframe"));
   });
 
-  const frame = page
-    .frames()
-    .find((candidate) =>
-      candidate.url().startsWith(`chrome-extension://${currentExtensionId}/sidepanel.html`),
-    );
-
-  expect(frame).toBeTruthy();
-  return frame;
+  const findFrame = () => page.frames().find((candidate) =>
+    candidate.url().startsWith(`chrome-extension://${currentExtensionId}/sidepanel.html`),
+  );
+  await expect.poll(() => Boolean(findFrame())).toBeTruthy();
+  return findFrame();
 }
 
 async function ensureLoggedIn(page) {
