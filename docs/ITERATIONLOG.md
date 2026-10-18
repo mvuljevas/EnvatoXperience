@@ -276,3 +276,8 @@ Registro corto de cambios relevantes para evitar pérdida de contexto entre sesi
 ### 2026-10-18 - Auth smoke runner context
 - Cambio: ruta temporal movida de env del job a env de los pasos, donde GitHub admite runner.temp.
 - Validación: tests Node; dispatch remoto vuelve a verificar el parser del workflow. El intento anterior fue rechazado antes de iniciar el job.
+
+### 2026-10-18 - User-facing repository and store packaging
+- README reorientado a instalación futura desde Chrome Web Store, uso, privacidad, soporte y transparencia. Documentación técnica separada en DEVELOPMENT.md y CONTRIBUTING.md.
+- Añadidos aviso de privacidad, licencia MIT ya declarada por el proyecto y paquete ZIP reproducible por allowlist con validación de referencias y rechazo de symlinks. Funding alineado con Sponsor, Ko-fi y PayPal.
+- Validación: pruebas de exclusión de credenciales/perfiles y consistencia de recursos, además de regresiones existentes. No se afirma aprobación ni publicación en Chrome Web Store; queda pendiente la revisión/listing y el login autenticado aprobado por el titular.
