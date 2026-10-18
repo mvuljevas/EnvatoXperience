@@ -1,0 +1,38 @@
+name: Pull request metadata
+on:
+  pull_request_target:
+    types: [opened, reopened, edited, synchronize, ready_for_review]
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      # No checkout or execution of PR code, including contributions from forks.
+      - uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const issue = {...context.repo, issue_number: pr.number};
+            if (!pr.assignees.some(user => user.login === 'mvuljevas')) {
+              await github.rest.issues.addAssignees({...issue, assignees: ['mvuljevas']});
+            }
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              ...context.repo, pull_number: pr.number, per_page: 100,
+            });
+            const paths = files.map(file => file.filename);
+            const labels = new Set();
+            const title = pr.title || '';
+            if (paths.some(path => /\.md$|^docs\/|^LICENSE$/.test(path))) labels.add('documentation');
+            if (paths.some(path => path.startsWith('.github/'))) labels.add('ci');
+            if (paths.some(path => /test|spec|playwright/.test(path))) labels.add('tests');
+            if (/\b(security|secrets?|credentials?|privacy)\b/i.test(title) || paths.some(path => /auth-smoke|^PRIVACY\.md$/.test(path))) labels.add('security');
+            if (paths.some(path => /package_extension|^PRIVACY\.md$|^LICENSE$/.test(path))) labels.add('store');
+            if (/^(fix|bugfix)(\b|\()/i.test(title)) labels.add('bug');
+            else if (paths.some(path => /^(content|sidepanel|background|envato-shared|marketplace|removed-items|image-cache)[.-]|^assets\/|^icons\//.test(path))) labels.add('enhancement');
+            if (pr.base.ref === 'main' && pr.head.ref === 'develop') labels.add('release');
+            if (!labels.size) labels.add('maintenance');
+            await github.rest.issues.addLabels({...issue, labels: [...labels]});

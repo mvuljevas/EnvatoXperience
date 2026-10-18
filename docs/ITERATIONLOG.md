@@ -283,3 +283,8 @@ Registro corto de cambios relevantes para evitar pérdida de contexto entre sesi
 - Validación: pruebas de exclusión de credenciales/perfiles y consistencia de recursos, además de regresiones existentes. No se afirma aprobación ni publicación en Chrome Web Store; queda pendiente la revisión/listing y el login autenticado aprobado por el titular.
 - Revisión adicional del paquete: se incluye la licencia OFL de Oswald y el aviso de materiales de terceros, sin atribuir marcas ajenas al autor del código.
 - Paquete final probado en Chromium desde ZIP extraído: 4 regresiones aprobadas; el runner permite seleccionar ese paquete sin cargar el checkout de desarrollo.
+
+### 2026-10-18 - PR classification and ownership
+- Workflow para asignar todos los PRs a mvuljevas y añadir labels por archivos, título y rama de integración. Usa pull_request_target sin checkout ni ejecución de código del PR, con action fijada por SHA.
+- Labels públicos: documentation, enhancement, bug, tests, ci, security, store, release y maintenance. Mantiene labels manuales y otros assignees.
+- Validación: pruebas de clasificación, fallback, asignación idempotente y títulos no confiables. PRs históricos clasificados y asignados.
