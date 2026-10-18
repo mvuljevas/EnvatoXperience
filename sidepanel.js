@@ -4,6 +4,9 @@
  */
 
 document.addEventListener("DOMContentLoaded", function () {
+  const versionLabel = document.getElementById("extensionVersion");
+  if (versionLabel) versionLabel.textContent = chrome.runtime.getManifest().version;
+
   const shared = window.EnvatoXperienceShared;
   const svgNs = "http://www.w3.org/2000/svg";
   const storageKeys = shared
