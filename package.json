@@ -4,10 +4,16 @@
   "scripts": {
     "smoke:extension": "playwright test --config=scripts/playwright.extension.config.cjs",
     "smoke:extension:headed": "playwright test --config=scripts/playwright.extension.config.cjs --headed",
-    "test": "node --test scripts/*.test.cjs",
-    "test:extension:regression": "playwright test --config=scripts/playwright.regression.config.cjs"
+    "test": "npm run version:check && node --test scripts/*.test.cjs",
+    "test:extension:regression": "playwright test --config=scripts/playwright.regression.config.cjs",
+    "version": "node scripts/version.cjs",
+    "version:check": "node scripts/version.cjs --check",
+    "release:patch": "npm version patch --no-git-tag-version",
+    "release:minor": "npm version minor --no-git-tag-version",
+    "release:major": "npm version major --no-git-tag-version"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2"
-  }
+  },
+  "version": "1.1.0"
 }

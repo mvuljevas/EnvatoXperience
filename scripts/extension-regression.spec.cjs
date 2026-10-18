@@ -65,6 +65,7 @@ test('product identity continues across item, reviews, comments and support', as
   for (const suffix of ['', '/reviews', '/comments', '/support']) {
     await page.goto(itemUrl + suffix);
     const frame = await panel(page);
+    await expect(frame.locator('#extensionVersion')).toHaveText(require('../manifest.json').version);
     await expect(frame.locator('#productTitleText')).toHaveText('Example Product');
     await expect(frame.locator('#itemDetailsPrice')).toContainText('$29');
   }

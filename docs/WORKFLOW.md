@@ -93,3 +93,9 @@ Para evitar colapsos de contexto durante sesiones largas, cada iteración debe d
 ## 5. Regresiones deterministas
 
 Ejecutar `npm test` para límites de dominio, ciclo de observadores y respuestas fuera de orden. Ejecutar `npm run test:extension:regression` para navegación automática/manual, widget, continuidad de metadata y toggle de Removed Items en Chromium con fixtures locales y perfil temporal aislado. Estas pruebas no sustituyen el smoke autenticado contra Envato real.
+
+## 6. Versionado SemVer
+
+La fuente es `package.json`; usar `npm run release:patch`, `release:minor` o `release:major` según corrección compatible, nueva funcionalidad compatible o cambio incompatible. El hook npm `version` sincroniza el manifiesto; npm mantiene el lockfile. About lee la versión del manifiesto en runtime. No editar versiones a mano ni repetir el literal en HTML.
+
+Los comandos no crean commits ni tags. Revisar cambios, ejecutar `npm test` y regresiones de extensión, hacer commit en la rama funcional, integrar a `develop` y finalmente a `main`. CI valida coherencia y formato estable X.Y.Z compatible con Chrome.

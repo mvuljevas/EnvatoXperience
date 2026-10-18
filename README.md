@@ -144,3 +144,15 @@ npm run test:extension:regression
 The regression suite uses an isolated temporary Chromium profile and locally fulfilled pages, without Envato credentials. It covers automatic and manual preview navigation, widget destination boundaries, product context across item subpages, and removed-item toggles. Node tests cover domain lookalikes, observer lifecycle, and responses arriving out of order. The existing live smoke remains necessary to check Envato selectors and authenticated downloads against the real website.
 
 Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` only when using an existing compatible Chromium executable. Temporary browser profiles are removed after the run; test output stays under the ignored `test-results/` directory.
+
+### Versioning
+
+The extension uses stable SemVer `X.Y.Z`. `package.json` is the version source, the npm version hook updates `manifest.json`, and npm updates `package-lock.json`. The About panel reads `chrome.runtime.getManifest().version`, so no UI version is hardcoded. Version `1.1.0` includes the functional improvements following `1.0.0`.
+
+- `npm run release:patch`: compatible bug fixes (`1.1.0` → `1.1.1`).
+- `npm run release:minor`: compatible new functionality (`1.1.0` → `1.2.0`).
+- `npm run release:major`: incompatible behavior changes (`1.1.0` → `2.0.0`).
+
+These commands update files without creating a Git commit or tag. Run them on the release feature branch, review the diff, run `npm test` and the extension regressions, then commit and merge into `develop` before merging into `main`. `npm run version:check` also runs in CI through `npm test` and rejects mismatches.
+
+Chrome-compatible versions use exactly three numeric components, each between 0 and 65535, without leading zeroes, prerelease/build suffixes, or `0.0.0`. Reload the extension and refresh its host tab to see a new version in Settings > About.

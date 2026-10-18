@@ -256,3 +256,12 @@ Registro corto de cambios relevantes para evitar pérdida de contexto entre sesi
 - Archivos: `scripts/*test.cjs`, `scripts/extension-regression.spec.cjs`, `scripts/playwright.regression.config.cjs`, `package.json`, `.github/workflows/regression.yml`, `README.md`, `docs/WORKFLOW.md`.
 - Validación: 3 pruebas Node y 4 pruebas Chromium aprobadas; redirección automática/manual, límites de widget, continuidad en cuatro subrutas y restauración/reactivación de descargas.
 - Limitaciones: smoke autenticado contra Envato real y ejecución de CI remoto pendientes. Resultados locales en `test-results/` ignorado por Git; perfiles temporales eliminados automáticamente.
+
+### 2026-10-17 - SemVer 1.1.0 and runtime About version
+- Objetivo: establecer SemVer X.Y.Z y eliminar la versión estática de About.
+- Archivos: `package.json`, `package-lock.json`, `manifest.json`, `sidepanel.html`, `sidepanel.js`, `scripts/version.cjs`, `scripts/version.test.cjs`, `scripts/extension-regression.spec.cjs`, `README.md`, `docs/WORKFLOW.md`.
+- Cambios: package.json como fuente; hook npm sincroniza manifiesto conservando formato; comandos release:patch/minor/major sin commits automáticos; About lee getManifest().version; chequeo de coherencia en CI y restricciones Chrome. Se elige 1.1.0 por mejoras funcionales compatibles desde 1.0.0.
+- Validación: 5 tests Node, incluyendo bumps reales patch/minor/major en directorio temporal, y 4 regresiones Chromium aprobadas; About coincide con el manifiesto. CI de la entrega anterior pasó en main y develop.
+- Smoke real: top sellers aprobado; apertura del panel aprobada tras corregir una carrera en el helper de tests, en rama y commit separados (`feature/smoke-frame-wait`). Downloads autenticado sigue sin validar: el formulario esperado no aparece y locator.fill agota 15 segundos incluso con plazo global ampliado. No se asume éxito ni se omite esa prueba.
+- Artefactos: reporte local en `output/playwright/extension-smoke/report/`; resultados en `test-results/`, ambos ignorados por Git. Perfiles de regresión temporales eliminados automáticamente.
+- Próximo paso: comprobar CI de 1.1.0, recargar extensión y validar el login real para completar smoke de descargas.
