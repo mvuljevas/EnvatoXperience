@@ -49,3 +49,9 @@
 ## Authenticated test data
 
 Public CI uses synthetic fixtures without credentials. Real-account tests are isolated in a manual workflow restricted to main with protected-environment approval. Credentials exist only in environment secrets and the private process environment; browser profiles are temporary, diagnostics suppressed, and no authenticated artifacts are uploaded. See `AUTHENTICATED_SMOKE.md` for setup, origin restrictions, cleanup and limitations.
+
+## Release package and user disclosure
+
+Build with `npm run package:extension`; only the validated runtime allowlist enters `dist/envato-xperience-X.Y.Z.zip`. Never archive the full checkout. The user README links the privacy notice and actual MIT license; technical instructions are kept in DEVELOPMENT.md. The store listing is not yet confirmed and the README must not imply approval or an available install link. Complete store privacy disclosures, permission justifications and listing screenshots before submission.
+
+Official submission guidance: https://developer.chrome.com/docs/webstore/prepare and https://developer.chrome.com/docs/webstore/cws-dashboard-privacy.
