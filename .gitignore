@@ -49,3 +49,7 @@ coverage/
 .playwright/
 output/playwright/
 test-results/
+
+# Python packaging checks
+__pycache__/
+*.pyc

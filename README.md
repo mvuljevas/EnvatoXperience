@@ -4,159 +4,56 @@
 
 # Envato XPerience
 
-A Chrome extension that enhances the Envato browsing experience with cleaner previews, preserved product context, optional live-demo helpers, and marketplace UI cleanup tools.
+A free Chrome extension that makes browsing Envato simpler: open live demos directly, keep product details close, and choose a cleaner marketplace view.
 
-## Features
+Made independently by [Mauricio Vuljevas](https://github.com/mvuljevas). This repository shares the source code so you can see what the extension does and how it works.
 
-- **Auto-Remove Mode**: Automatically removes preview frames on visit (enabled by default).
-- **Floating Control Panel**: A sleek, non-intrusive side panel with a focused Status view and a broader Admin view.
-- **Premium UI**: "Glassmorphism" design with smooth, switch-like animations.
-- **Context Preservation (Floating Widget)**: Optionally injects an elegant floating button panel on the creator's real external website, retaining Envato's "Buy Now" and "Details" links even after the redirect.
-- **Hide Ads Toggle**: Optionally suppresses major Envato promotional surfaces such as top banners, Elements cross-sells, footer promos, marketplace switcher ads, `top-sellers` author sidebars, and account/download promos.
-- **Hide Removed Items**: Optionally compacts deprecated/removed items in your Downloads page into elegant, sleek action bars. Offers Just-In-Time thumbnail extraction on hover, native fallback certificate downloads, and instant DOM cleanups.
-- **Stable Product Identity**: Uses the canonical Envato `itemId` from `/item/.../<id>` URLs so product data stays aligned across item, reviews, comments, and support tabs.
-- **Local Image Cache**: Stores product hero images in `IndexedDB` with TTL and eviction rules instead of bloating extension storage.
-- **Contextual Status States**: Outside item pages, the panel switches to premium editorial states for browse, preview, and fallback contexts instead of showing a dead loading message.
-- **Compact Product Card**: The sidepanel now renders a tighter, Envato-inspired product card with title, author, category, price, sales, rating, last update, and direct live preview access.
-- **Support Section**: The Admin tab includes a lightweight funding card with GitHub Sponsors, Ko-fi, and PayPal support options for independent development.
-- **Smart Detection**: Specifically extracts product metadata from Envato domains and targets the `.full-screen-preview__frame` container safely.
-- **Shadow DOM Isolation**: The UI and floating widgets are strictly encapsulated in Shadow DOM to avoid CSS bleeding onto any theme's complex stylesheets.
+## Get the extension
 
-## Installation
+Envato XPerience is being prepared for the Chrome Web Store. The installation link will appear here once the listing is available. You will be able to install it through Chrome without downloading code or using developer tools.
 
-### From Source
+## What it does
 
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/mvuljevas/envato-xperience.git
-   ```
-2. Open Chrome and navigate to `chrome://extensions/`.
-3. Enable **Developer mode** (toggle in top-right corner).
-4. Click **Load unpacked** and select the `envato-xperience` folder.
+- **Open demos directly.** Skip the Envato preview bar and visit the author's live demo.
+- **Keep product links nearby.** An optional floating widget gives you Details and Buy Now links while viewing a demo.
+- **See product information.** Open the extension panel to view available pricing, ratings and other details.
+- **Hide supported promotions.** Choose a cleaner view on supported Envato pages.
+- **Simplify your downloads.** Compact unavailable items while keeping their details and existing license links accessible. This does not restore removed products or unlock downloads.
 
-## Usage
+Works with supported pages on ThemeForest, CodeCanyon and other Envato Market sites. Available details and features depend on the page and may change when Envato updates its website.
 
-- **Auto-Remove**: Just browse Envato network sites (ThemeForest, CodeCanyon, VideoHive, etc.). Preview wrappers can redirect you directly into clean live demos.
-- **Floating Control Panel**: Click the extension icon to toggle the floating panel on any Envato page. From there, you can:
-    - Open the live preview directly from supported preview pages.
-    - Use `Status` for the current marketplace or product context.
-    - Use the `Admin` tab for core and enhancement controls such as **Auto Remove**, **Floating Widget**, **Hide Ads**, and **Hide Removed Items**.
-    - Open the bottom gear-powered **Settings** surface inside `Admin` for `About` and `Support`.
+## Everyday use
 
-## Technical Details
+Once installed, open an Envato page and click the Envato XPerience icon in Chrome. Pin it to the toolbar if you want easier access.
 
-- **Manifest V3**: Compliant with the latest Chrome Extension standards, utilizing `chrome.storage.local` context passing mechanisms and full domain permissions `<all_urls>` for cross-origin widget injection.
-- **Architecture**:
-    - `envato-shared.js`: Shared helpers for Envato host detection, canonical `itemId` parsing, site naming, and settings compatibility/migration.
-    - `marketplace-init.js`: Early `document_start` bootstrap that mirrors the `Hide Ads` setting into the page root before the marketplace paints, using both extension storage and a per-host `localStorage` mirror to reduce first-paint flicker.
-    - `marketplace-overrides.css`: Declarative anti-flicker stylesheet that collapses supported Envato ad surfaces immediately when `Hide Ads` is enabled, including shared browse/category sidebars and downloads/account promo rails.
-    - `content.js`: Captures Envato metadata on previews, uses Envato `itemId` as the stable product key, fires secure redirects, and injects floating Shadow DOM widgets into third-party target showcase websites.
-    - `removed-items.js`: Isolated DOM-safe transformer for unavailable downloads, including compact action bars, JIT thumbnail hydration, and lightweight downloads-list observation.
-    - `content.css`: Base layout requirements for the floating panel.
-    - `assets/`: Shared UI assets grouped into `fonts/`, `images/`, and `icons/`.
-    - `sidepanel.html/css/js`: An aesthetic UI implementation loaded inside an isolated inner iframe, with a compact Status view, an Admin control surface, and a bottom-triggered Settings sub-view.
-    - `image-cache.js`: `IndexedDB`-backed image cache with checksum, TTL, and eviction rules for product artwork.
-    - `background.js`: Event handler orchestration (relaying extension clicks).
+**Status** shows information about the current page. In **Admin**, choose which features to enable: Auto Remove, Floating Widget, Hide Ads and Hide Removed Items. Auto Remove is enabled by default; the other enhancements are optional. The gear button opens **Settings**, where you can find the version, About and Support.
 
-## Compliance
+You do not need to create an account with this extension. Your usual Envato account and purchases remain subject to Envato's own terms.
 
-- The extension is packaged as a self-contained Manifest V3 project with no remote JavaScript.
-- The panel typography is bundled locally, including `Oswald`, with no remote font dependency.
-- Product metadata is rendered using safe DOM APIs rather than `innerHTML`.
-- Cached product images are stored in `IndexedDB`, not `chrome.storage.local`.
-- Envato ad suppression is applied through packaged `document_start` CSS and a lightweight local bootstrap with a host-level mirror, reducing visible flicker without remote dependencies.
-- Compliance notes and pre-publish review guidance live in `docs/COMPLIANCE.md`.
-- Cache architecture and storage rationale live in `docs/IMAGECACHE.md`.
+## Privacy and permissions
 
-## Development
+The extension uses page information to show product details and provide its browsing features. It does not send that information to a developer-operated server, include analytics, or ask for your Envato password.
 
-### Smoke Automation
+Chrome may request access to websites because live demos can be hosted on authors' own domains. This allows the optional widget to keep product links available after leaving Envato. Preferences use Chrome's settings storage and may sync through your browser account; product context and image caches are stored in the browser.
 
-For repeatable local smoke checks, the repo now includes a Playwright-based extension runner:
+Read the [privacy notice](PRIVACY.md) for storage details, external links and how to remove saved data. The source is public for anyone who wants to inspect these behaviors.
 
-```bash
-npm install
-npm run smoke:extension
-```
+## Need help or have an idea?
 
-What it does:
-- launches Chromium with the unpacked extension loaded from the repo
-- uses a standard persistent profile directory at `.playwright/chrome-extension-dev`
-- opens the floating panel through a small DOM test bridge in `content.js`
-- validates `Hide Ads` on supported item, browse, and `top-sellers` pages
-- keeps authenticated checks in the separate protected manual workflow described below
+[Report a problem or suggest an improvement](https://github.com/mvuljevas/EnvatoXperience/issues). Describe what happened and which page you were using. Do not include passwords, account details, license certificates or private screenshots.
 
-Useful overrides:
-- `PLAYWRIGHT_EXTENSION_PROFILE_DIR`: reuse an existing Chrome/Chromium dev profile instead of the default local profile
-- `PLAYWRIGHT_EXTENSION_PATH`: override the unpacked extension path
-- `SMOKE_ITEM_URL`: override the item-page smoke URL
-- `SMOKE_TOP_SELLERS_URL`: override the browse/top-sellers smoke URL
+## Support this and other projects
 
-Notes:
-- The public live smoke covers `item page` and `top-sellers`; authenticated downloads use the private runner.
-- Reusing a real Chrome profile works only when Chrome is not already holding the same root user-data directory lock.
+If you like this tool or find it useful, you can support this and my other projects.
 
-### File Structure
+- [GitHub Sponsors](https://github.com/sponsors/mvuljevas)
+- [Ko-fi](https://ko-fi.com/mvuljevas)
+- [PayPal](https://www.paypal.com/paypalme/mvuljevas)
 
-```
-envato-xperience/
-├── manifest.json       # Extension configuration
-├── background.js       # Service worker
-├── envato-shared.js    # Shared helpers for hosts, item IDs, and settings
-├── marketplace-init.js # Early settings bootstrap for host-page overrides
-├── marketplace-overrides.css # Early ad-suppression rules for Envato pages
-├── package.json        # Local Playwright smoke tooling entrypoints
-├── scripts/            # Playwright extension smoke config/spec
-├── .env.local.example  # Reference names; CI secrets are entered directly in GitHub
-├── content.js          # Preview, widget, and panel bridge logic
-├── removed-items.js    # Removed/unavailable downloads UI enhancement
-├── content.css         # Container styles
-├── assets/             # Shared UI assets
-│   ├── fonts/          # Local bundled fonts for extension UI
-│   ├── icons/          # Sidepanel/support SVG icons
-│   └── images/         # UI images, logos, and README artwork
-├── image-cache.js      # IndexedDB-backed image cache
-├── sidepanel.html      # Panel Structure
-├── sidepanel.css       # Panel Styles
-├── sidepanel.js        # Panel Logic
-├── icons/              # Assets
-├── docs/               # Workflow, roadmap, compliance, cache notes
-└── README.md           # This file
-```
+You can also explore [my other projects](https://github.com/mvuljevas). Support is optional; the extension remains free.
 
-## Credits
+## Open source
 
-Crafted by [Mauricio Vuljevas](https://www.mvuljevas.com?utm_source=envatoxperience).
+Source code is released under the [MIT License](LICENSE); bundled materials have [third-party notices](THIRD_PARTY_NOTICES.md). Contributions are welcome; see the [contributor guide](CONTRIBUTING.md). Technical documentation lives in [docs](docs/DEVELOPMENT.md).
 
-## License
-
-MIT License.
-
-### Deterministic regression checks
-
-```bash
-npm ci
-npm test
-npx playwright install chromium
-npm run test:extension:regression
-```
-
-The regression suite uses an isolated temporary Chromium profile and locally fulfilled pages, without Envato credentials. It covers automatic and manual preview navigation, widget destination boundaries, product context across item subpages, and removed-item toggles. Node tests cover domain lookalikes, observer lifecycle, and responses arriving out of order. The public live smoke checks real Envato selectors; the separate protected manual workflow checks authenticated downloads.
-
-Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` only when using an existing compatible Chromium executable. Temporary browser profiles are removed after the run; test output stays under the ignored `test-results/` directory.
-
-### Versioning
-
-The extension uses stable SemVer `X.Y.Z`. `package.json` is the version source, the npm version hook updates `manifest.json`, and npm updates `package-lock.json`. The About panel reads `chrome.runtime.getManifest().version`, so no UI version is hardcoded. Version `1.1.0` includes the functional improvements following `1.0.0`.
-
-- `npm run release:patch`: compatible bug fixes (`1.1.0` → `1.1.1`).
-- `npm run release:minor`: compatible new functionality (`1.1.0` → `1.2.0`).
-- `npm run release:major`: incompatible behavior changes (`1.1.0` → `2.0.0`).
-
-These commands update files without creating a Git commit or tag. Run them on the release feature branch, review the diff, run `npm test` and the extension regressions, then commit and merge into `develop` before merging into `main`. `npm run version:check` also runs in CI through `npm test` and rejects mismatches.
-
-Chrome-compatible versions use exactly three numeric components, each between 0 and 65535, without leading zeroes, prerelease/build suffixes, or `0.0.0`. Reload the extension and refresh its host tab to see a new version in Settings > About.
-
-### Authenticated checks in a public repository
-
-Authenticated downloads are tested only through the manual **Private authenticated smoke** workflow on `main`, behind the `envato-auth-smoke` environment approval. Add `ENVATO_TEST_USERNAME` and `ENVATO_TEST_PASSWORD` directly as environment secrets in GitHub, using a dedicated account. No authenticated screenshots, reports, traces or profiles are published. See [setup, protections and limitations](docs/AUTHENTICATED_SMOKE.md).
+Envato XPerience is an independent project, not affiliated with or endorsed by Envato. Envato and marketplace names belong to their respective owners.
