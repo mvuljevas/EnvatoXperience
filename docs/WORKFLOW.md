@@ -103,3 +103,7 @@ Los comandos no crean commits ni tags. Revisar cambios, ejecutar `npm test` y re
 ## 7. Smoke autenticado protegido
 
 El smoke general ya no carga `.env.local` ni ejecuta descargas autenticadas. Usar únicamente el workflow manual `Private authenticated smoke` sobre main y el entorno protegido `envato-auth-smoke`. Cargar credenciales de una cuenta de pruebas directamente como environment secrets en GitHub. Ver `AUTHENTICATED_SMOKE.md`; no publicar capturas, perfiles ni diagnósticos del login.
+
+## 8. Repositorio público y pull requests
+
+`develop` es la rama por defecto y recibe los PRs funcionales. `main` recibe integraciones revisadas desde develop. Todos los PRs se asignan a mvuljevas; el workflow de metadata añade labels por área sin quitar labels manuales. Usa pull_request_target únicamente para la API de GitHub y nunca hace checkout ni ejecuta código del PR. Las ramas auxiliares integradas se eliminan; main y develop se conservan. El README es para usuarios finales, la documentación de desarrollo vive en DEVELOPMENT.md y el ZIP de tienda se genera por allowlist.

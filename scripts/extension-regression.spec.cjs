@@ -6,6 +6,7 @@ let context, profile, worker;
 const itemUrl = 'https://themeforest.net/item/example/123';
 const previewUrl = 'https://preview.themeforest.net/item/example/full_screen_preview/123';
 const demoUrl = 'https://demo.example.org/';
+const extensionPath = path.resolve(process.env.PLAYWRIGHT_EXTENSION_PATH || process.cwd());
 const item = '<h1>Example Product</h1><div class="js-purchase-price">$29</div><a href="https://preview.themeforest.net/item/example/full_screen_preview/123">Preview</a>';
 async function settings(patch) { await worker.evaluate(patch => chrome.storage.sync.set(patch), patch); }
 async function panel(page) {
@@ -18,7 +19,7 @@ test.beforeAll(async () => {
   context = await chromium.launchPersistentContext(profile, {
     channel: 'chromium', headless: true,
     ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ? {executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE} : {}),
-    args: [`--disable-extensions-except=${process.cwd()}`, `--load-extension=${process.cwd()}`],
+    args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`],
   });
   worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
   await context.route(/^https:\/\/(themeforest\.net|preview\.themeforest\.net|demo\.example\.org|demo\.example\.org\.other\.test)\//, async route => {

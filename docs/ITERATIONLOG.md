@@ -276,3 +276,15 @@ Registro corto de cambios relevantes para evitar pérdida de contexto entre sesi
 ### 2026-10-18 - Auth smoke runner context
 - Cambio: ruta temporal movida de env del job a env de los pasos, donde GitHub admite runner.temp.
 - Validación: tests Node; dispatch remoto vuelve a verificar el parser del workflow. El intento anterior fue rechazado antes de iniciar el job.
+
+### 2026-10-18 - User-facing repository and store packaging
+- README reorientado a instalación futura desde Chrome Web Store, uso, privacidad, soporte y transparencia. Documentación técnica separada en DEVELOPMENT.md y CONTRIBUTING.md.
+- Añadidos aviso de privacidad, licencia MIT ya declarada por el proyecto y paquete ZIP reproducible por allowlist con validación de referencias y rechazo de symlinks. Funding alineado con Sponsor, Ko-fi y PayPal.
+- Validación: pruebas de exclusión de credenciales/perfiles y consistencia de recursos, además de regresiones existentes. No se afirma aprobación ni publicación en Chrome Web Store; queda pendiente la revisión/listing y el login autenticado aprobado por el titular.
+- Revisión adicional del paquete: se incluye la licencia OFL de Oswald y el aviso de materiales de terceros, sin atribuir marcas ajenas al autor del código.
+- Paquete final probado en Chromium desde ZIP extraído: 4 regresiones aprobadas; el runner permite seleccionar ese paquete sin cargar el checkout de desarrollo.
+
+### 2026-10-18 - PR classification and ownership
+- Workflow para asignar todos los PRs a mvuljevas y añadir labels por archivos, título y rama de integración. Usa pull_request_target sin checkout ni ejecución de código del PR, con action fijada por SHA.
+- Labels públicos: documentation, enhancement, bug, tests, ci, security, store, release y maintenance. Mantiene labels manuales y otros assignees.
+- Validación: pruebas de clasificación, fallback, asignación idempotente y títulos no confiables. PRs históricos clasificados y asignados.
