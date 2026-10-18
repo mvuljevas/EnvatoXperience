@@ -113,7 +113,7 @@ Chrome-compatible versions use exactly three numeric components, each between 0 
 
 ## Authenticated checks in a public repository
 
-Authenticated downloads are tested only through the manual **Private authenticated smoke** workflow on `main`, behind the `envato-auth-smoke` environment approval. Add `ENVATO_TEST_USERNAME` and `ENVATO_TEST_PASSWORD` directly as environment secrets in GitHub, using a dedicated account. No authenticated screenshots, reports, traces or profiles are published. See [setup, protections and limitations](docs/AUTHENTICATED_SMOKE.md).
+Authenticated downloads are tested only through the manual **Private authenticated smoke** workflow on `main`, behind the `envato-auth-smoke` environment approval. Add `ENVATO_TEST_USERNAME` and `ENVATO_TEST_PASSWORD` directly as environment secrets in GitHub, using a dedicated account. No authenticated screenshots, reports, traces or profiles are published. See [setup, protections and limitations](AUTHENTICATED_SMOKE.md).
 
 ## Store package
 
