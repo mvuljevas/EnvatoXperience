@@ -282,3 +282,4 @@ Registro corto de cambios relevantes para evitar pérdida de contexto entre sesi
 - Añadidos aviso de privacidad, licencia MIT ya declarada por el proyecto y paquete ZIP reproducible por allowlist con validación de referencias y rechazo de symlinks. Funding alineado con Sponsor, Ko-fi y PayPal.
 - Validación: pruebas de exclusión de credenciales/perfiles y consistencia de recursos, además de regresiones existentes. No se afirma aprobación ni publicación en Chrome Web Store; queda pendiente la revisión/listing y el login autenticado aprobado por el titular.
 - Revisión adicional del paquete: se incluye la licencia OFL de Oswald y el aviso de materiales de terceros, sin atribuir marcas ajenas al autor del código.
+- Paquete final probado en Chromium desde ZIP extraído: 4 regresiones aprobadas; el runner permite seleccionar ese paquete sin cargar el checkout de desarrollo.
