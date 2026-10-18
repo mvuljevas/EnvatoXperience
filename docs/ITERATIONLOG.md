@@ -272,3 +272,7 @@ Registro corto de cambios relevantes para evitar pérdida de contexto entre sesi
 - Auditoría: 217 blobs históricos alcanzables desde origin comparados con secretos locales sin imprimir valores; sin coincidencias. Rutas .env/perfiles ausentes de origin; existe un perfil en stash local, no publicado.
 - Validación: 10 pruebas Node y 4 regresiones Chromium aprobadas; rechazo de orígenes, aislamiento de entorno, supresión de errores, resultados de timeout y cleanup. Entorno remoto configurado y releído: reviewer mvuljevas, bypass desactivado y política de rama main únicamente. No se ejecuta login real ni se cargan secretos por chat.
 - Pendiente: autor debe cargar environment secrets de cuenta dedicada y aprobar una ejecución para validar el login real.
+
+### 2026-10-18 - Auth smoke runner context
+- Cambio: ruta temporal movida de env del job a env de los pasos, donde GitHub admite runner.temp.
+- Validación: tests Node; dispatch remoto vuelve a verificar el parser del workflow. El intento anterior fue rechazado antes de iniciar el job.

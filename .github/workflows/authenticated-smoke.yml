@@ -12,8 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: envato-auth-smoke
-    env:
-      AUTH_SMOKE_ROOT: ${{ runner.temp }}/envato-auth-smoke
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -26,9 +24,12 @@ jobs:
       - name: Check authenticated downloads privately
         run: node scripts/auth-smoke.cjs
         env:
+          AUTH_SMOKE_ROOT: ${{ runner.temp }}/envato-auth-smoke
           ENVATO_TEST_USERNAME: ${{ secrets.ENVATO_TEST_USERNAME }}
           ENVATO_TEST_PASSWORD: ${{ secrets.ENVATO_TEST_PASSWORD }}
       - name: Remove private browser data
         if: always()
         shell: bash
+        env:
+          AUTH_SMOKE_ROOT: ${{ runner.temp }}/envato-auth-smoke
         run: rm -rf -- "$AUTH_SMOKE_ROOT"
