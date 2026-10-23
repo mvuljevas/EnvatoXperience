@@ -297,3 +297,15 @@ Registro corto de cambios relevantes para evitar pérdida de contexto entre sesi
 - Validación: npm test con 18 pruebas Node correctas y 2 pruebas Python correctas; 1 prueba Python omitida por privilegio de symlink ausente. Los incrementos de versión se ejercitan en copias temporales.
 - Riesgos pendientes: CI Linux y creación real de symlinks no se ejecutaron en este equipo.
 - Próximo paso: completar la reconciliación de las correcciones runtime y validar el ZIP distribuible.
+
+
+### 2026-10-23 - Reconcile local hardening with origin/develop
+- Base: develop actualizado por fast-forward de e83dcc8 a 1563ede (27 commits remotos). Respaldo íntegro, incluidos los archivos nuevos, en stash y refs/backups/local-before-origin-20261023, objeto 005879c7a6780dc612889217352802e6b3285d24.
+- Criterio: conservar implementación remota de dominios, widget con host exacto, espera del panel, licencia, versionado 1.1.0, empaquetado y autenticación protegida; no reintroducir la antigua ruta autenticada en el smoke público ni los scripts/workflows redundantes.
+- Cambios runtime: limitar CSS/bootstrap temprano a nueve hosts Envato, añadir guardia defensiva de host, observar iframe/src tardíos hasta 30 segundos y rechazar timestamps inválidos o futuros.
+- Pruebas: cuatro regresiones runtime en la suite Node existente; tres escenarios adicionales en la suite Chromium existente (CSS externo, iframe tardío y controles Admin reversibles con persistencia/Settings/cierre). Smoke remoto exige nodos reales y registra desafíos de seguridad como bloqueo externo explícito.
+- Documentación: detalles técnicos en DEVELOPMENT y COMPLIANCE; README permanece orientado al usuario según origin.
+- Validación: 18 pruebas Node correctas; 2 pruebas Python correctas y 1 omitida solo por WinError 1314; 7 regresiones Chromium correctas tanto en checkout como en el ZIP generado; sintaxis JavaScript y git diff --check correctos. Captura 1440x900 inspeccionada; sin pageerrors en el flujo Admin.
+- Límites: smoke público remoto omitió ambas páginas por Cloudflare; smoke autenticado no ejecutado. CI remoto pendiente porque no se hizo push. La cobertura con fixtures se distingue de la validación del DOM remoto.
+- Artefactos: dist/envato-xperience-1.1.0.zip, captura %TEMP%/envatoxperience-reconciled-panel.png y reporte Playwright ignorado por Git. Extracciones temporales de comprobación en %TEMP%/envato-package-reconciled-20261023073536 y %TEMP%/envato-package-final-20261023073707.
+- Próximo paso: publicar los commits de develop para ejecutar CI y completar la validación remota con un perfil autorizado.

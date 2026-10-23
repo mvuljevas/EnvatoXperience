@@ -22,7 +22,7 @@ test.beforeAll(async () => {
     args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`],
   });
   worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
-  await context.route(/^https:\/\/(themeforest\.net|preview\.themeforest\.net|demo\.example\.org|demo\.example\.org\.other\.test)\//, async route => {
+  await context.route(/^https:\/\/(themeforest\.net|preview\.themeforest\.net|demo\.example\.org|demo\.example\.org\.other\.test|unrelated\.example\.test)\//, async route => {
     const url = new URL(route.request().url());
     let body = item;
     if (url.hostname.startsWith('preview.')) body = `<a class="t-link--hidden-reversed" href="${itemUrl}">Example Product</a><a class="buy-btn" href="https://themeforest.net/checkout/123">Buy</a><iframe class="full-screen-preview__frame" src="${demoUrl}"></iframe>`;
@@ -30,6 +30,75 @@ test.beforeAll(async () => {
     else if (url.pathname === '/downloads') body = '<ul class="list--downloads"><li class="download" id="item-456"><h3>Removed Product</h3><div class="download__unavailable">Unavailable</div><a href="/license/456">License certificate</a></li></ul>';
     await route.fulfill({contentType:'text/html', body: `<!doctype html><html><body>${body}</body></html>`});
   });
+});
+
+test('late preview iframe and src still redirect to the saved widget destination', async () => {
+  await settings({autoRemove:true, widgetMode:true});
+  const page = await context.newPage();
+  await page.route(previewUrl, route => route.fulfill({contentType:'text/html', body:'<!doctype html><html><body><h1>Late preview</h1></body></html>'}));
+  await page.goto(previewUrl);
+  await panel(page); // Acknowledges that document_idle initialization completed.
+  await page.evaluate(() => {
+    const iframe = document.createElement('iframe');
+    iframe.className = 'full-screen-preview__frame';
+    document.body.appendChild(iframe);
+  });
+  await page.evaluate(url => { document.querySelector('iframe.full-screen-preview__frame').src = url; }, demoUrl);
+  await page.waitForURL(demoUrl);
+  await expect(page.locator('#envato-custom-widget-root')).toBeVisible();
+  await page.close();
+});
+
+test('marketplace styles do not alter generic content on unrelated sites', async () => {
+  await settings({autoRemove:false, widgetMode:false, hideAds:true, hideDeprecated:true});
+  const page = await context.newPage();
+  await page.goto('https://unrelated.example.test/');
+  await panel(page);
+  await page.evaluate(() => {
+    const element = document.createElement('div');
+    element.className = 'cross-sell'; element.textContent = 'Unrelated content';
+    document.body.appendChild(element);
+  });
+  await expect(page.locator('.cross-sell')).toBeVisible();
+  await expect(page.locator('html')).not.toHaveAttribute('data-envato-hide-ads');
+  await expect(page.locator('html')).not.toHaveAttribute('data-envato-hide-deprecated');
+  await page.close();
+});
+
+test('Admin controls persist and reverse marketplace suppression', async () => {
+  await settings({autoRemove:false, widgetMode:false, hideAds:false, hideDeprecated:false});
+  const page = await context.newPage();
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.setViewportSize({width:1440, height:900});
+  await page.goto(itemUrl);
+  await page.evaluate(() => {
+    const element = document.createElement('div');
+    element.className = 'cross-sell'; element.textContent = 'Marketplace promotion';
+    document.body.appendChild(element);
+  });
+  const frame = await panel(page);
+  await expect(frame.locator('#productTitleText')).toHaveText('Example Product');
+  await frame.getByRole('button', {name:'Admin', exact:true}).click();
+  const toggle = frame.locator('label.switch').filter({has:frame.locator('#adminHideAds')});
+  await toggle.click();
+  await expect(frame.locator('#adminHideAds')).toBeChecked();
+  await expect(page.locator('.cross-sell')).toBeHidden();
+  await expect.poll(() => frame.evaluate(async () => (await chrome.storage.sync.get('hideAds')).hideAds)).toBe(true);
+  await toggle.click();
+  await expect(frame.locator('#adminHideAds')).not.toBeChecked();
+  await expect(page.locator('.cross-sell')).toBeVisible();
+  await frame.locator('#openAdminSettings').click();
+  await expect(frame.locator('#adminSettingsView')).toBeVisible();
+  await frame.locator('#closeAdminSettings').click();
+  await frame.getByRole('button', {name:'Status', exact:true}).click();
+  await expect(frame.locator('#actionTab')).toHaveCSS('opacity','1');
+  await expect(frame.locator('.tab-glider')).toHaveCSS('transform','none');
+  await page.screenshot({path:path.join(os.tmpdir(),'envatoxperience-reconciled-panel.png')});
+  await frame.locator('#closePanel').click();
+  await expect(page.locator('#envato-xperience-root #panel-wrapper')).not.toHaveClass(/visible/);
+  expect(errors).toEqual([]);
+  await page.close();
 });
 test.afterAll(async () => {
   if (context) await context.close();

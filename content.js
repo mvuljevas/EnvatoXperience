@@ -161,12 +161,32 @@ function isEnvatoMarketplaceLogo(url) {
 /**
  * Opens the live preview destination, optionally preserving product context
  */
+let previewObserver = null;
+let previewObserverTimeout = null;
+
+function stopPreviewObserver() {
+  previewObserver?.disconnect();
+  previewObserver = null;
+  clearTimeout(previewObserverTimeout);
+}
+
 function openLivePreview(useWidgetMode = false) {
   try {
     const previewIframe = document.querySelector(
       "iframe.full-screen-preview__frame",
     );
-    if (!previewIframe) return;
+    if (!previewIframe || !previewIframe.getAttribute("src")) {
+      if (!previewObserver) {
+        previewObserver = new MutationObserver(() => openLivePreview(useWidgetMode));
+        previewObserver.observe(document.documentElement, {
+          childList: true, subtree: true, attributes: true, attributeFilter: ["src"],
+        });
+        previewObserverTimeout = setTimeout(stopPreviewObserver, 30000);
+        window.addEventListener("pagehide", stopPreviewObserver, { once: true });
+      }
+      return;
+    }
+    stopPreviewObserver();
 
     if (previewIframe.src) {
       const targetUrl = previewIframe.src;
@@ -403,7 +423,8 @@ function checkAndInjectWidget() {
       const info = result.activeEnvatoPreview;
       
       // Check if context is fresh (e.g. within 2 hours)
-      const isFresh = (Date.now() - info.timestamp) < (2 * 60 * 60 * 1000);
+      const age = Date.now() - info.timestamp;
+      const isFresh = Number.isFinite(info.timestamp) && age >= 0 && age < (2 * 60 * 60 * 1000);
       
       if (isFresh && window.location.hostname === info.targetDomain) {
         injectWidget(info);

@@ -55,3 +55,10 @@ Public CI uses synthetic fixtures without credentials. Real-account tests are is
 Build with `npm run package:extension`; only the validated runtime allowlist enters `dist/envato-xperience-X.Y.Z.zip`. Never archive the full checkout. The user README links the privacy notice and actual MIT license; technical instructions are kept in DEVELOPMENT.md. The store listing is not yet confirmed and the README must not imply approval or an available install link. Complete store privacy disclosures, permission justifications and listing screenshots before submission.
 
 Official submission guidance: https://developer.chrome.com/docs/webstore/prepare and https://developer.chrome.com/docs/webstore/cws-dashboard-privacy.
+
+
+## Marketplace isolation
+
+Only the nine Envato marketplace host patterns receive `marketplace-overrides.css` and the `document_start` settings bootstrap. The bootstrap additionally checks the current hostname before touching document flags or storage. The separate content script retains `<all_urls>` for the optional external-demo widget and panel; marketplace suppression is not applied to unrelated sites.
+
+Preview context requires a finite timestamp aged between zero and two hours. Preview iframe insertion and `src` changes are observed for up to 30 seconds, with cleanup after detection, timeout or page exit.

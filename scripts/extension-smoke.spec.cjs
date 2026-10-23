@@ -70,6 +70,7 @@ test("opens the floating panel on an item page", async ({}, testInfo) => {
 
   const page = await context.newPage();
   await page.goto(smokeConfig.itemUrl, { waitUntil: "domcontentloaded" });
+  await requireLiveMarketplace(page, testInfo);
   await page.waitForFunction(() => document.readyState === "complete");
 
   await dispatchContentTestEvent(page, "openPanel");
@@ -100,6 +101,7 @@ test("hides supported ads on top sellers", async ({}, testInfo) => {
 
   const page = await context.newPage();
   await page.goto(smokeConfig.topSellersUrl, { waitUntil: "domcontentloaded" });
+  await requireLiveMarketplace(page, testInfo);
   await page.waitForFunction(() => {
     return document.documentElement.dataset.envatoHideAds === "true";
   });
@@ -108,7 +110,7 @@ test("hides supported ads on top sellers", async ({}, testInfo) => {
     const sidebar = document.querySelector(
       ".shared-items_grid_with_sidebar_component__sidebar",
     );
-    return !sidebar || getComputedStyle(sidebar).display === "none";
+    return Boolean(sidebar) && getComputedStyle(sidebar).display === "none";
   });
 
   await page.screenshot({
@@ -180,4 +182,14 @@ function resolveChromeProfile(inputPath) {
     userDataDir: resolvedPath,
     profileDirectory: "",
   };
+}
+
+async function requireLiveMarketplace(page, testInfo) {
+  if (/just a moment|attention required/i.test(await page.title())) {
+    await testInfo.attach('marketplace-security-check', {
+      body: await page.screenshot(), contentType: 'image/png',
+    });
+    await page.close();
+    test.skip(true, 'External blocker: marketplace returned a security check. Live DOM validation did not run.');
+  }
 }

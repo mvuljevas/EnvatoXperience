@@ -118,3 +118,12 @@ Authenticated downloads are tested only through the manual **Private authenticat
 ## Store package
 
 Run `npm run package:extension` to create a ZIP in `dist/`. The allowlist contains only runtime files, required images, fonts, icons and the license; it rejects symlinks and verifies local HTML/CSS references. Tests verify that development tools and secret files cannot enter the ZIP. Python 3 (standard library only) is required to build the archive. Never upload a ZIP of the full checkout.
+
+
+## Runtime regression coverage
+
+`npm test` includes deterministic checks for marketplace-only CSS registration, bootstrap guards, late preview detection and context timestamp validity. `npm run test:extension:regression` exercises the unpacked extension using isolated page fixtures, including external-site CSS isolation, late iframe insertion, reversible Admin controls, persistence, Settings and panel closure. These fixtures do not establish compatibility with the current live marketplace DOM.
+
+The public live smoke requires target nodes to exist. A marketplace security challenge is explicitly reported as an external blocker with screenshot evidence, rather than treated as a passing product page. Account validation remains exclusively in the protected authenticated-smoke workflow.
+
+On Windows, an existing terminal may need to reload the user-level `PLAYWRIGHT_BROWSERS_PATH` after the browser cache is relocated. PR metadata tests normalize CRLF, release tests launch the npm JavaScript CLI, and the package symlink test explicitly skips only Windows error 1314 (missing symlink privilege); Linux CI still exercises the real symlink rejection.
