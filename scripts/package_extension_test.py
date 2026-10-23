@@ -38,7 +38,12 @@ class PackageTests(unittest.TestCase):
         file.unlink()
         secret = Path(self.temp.name) / 'private'
         secret.write_text('synthetic-private-data')
-        file.symlink_to(secret)
+        try:
+            file.symlink_to(secret)
+        except OSError as error:
+            if getattr(error, 'winerror', None) == 1314:
+                self.skipTest('Windows does not grant this user symbolic-link creation privileges; Linux CI exercises this check.')
+            raise
         with self.assertRaises(ValueError):
             build(self.root, self.output)
         self.assertFalse(self.output.exists())

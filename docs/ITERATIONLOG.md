@@ -288,3 +288,12 @@ Registro corto de cambios relevantes para evitar pérdida de contexto entre sesi
 - Workflow para asignar todos los PRs a mvuljevas y añadir labels por archivos, título y rama de integración. Usa pull_request_target sin checkout ni ejecución de código del PR, con action fijada por SHA.
 - Labels públicos: documentation, enhancement, bug, tests, ci, security, store, release y maintenance. Mantiene labels manuales y otros assignees.
 - Validación: pruebas de clasificación, fallback, asignación idempotente y títulos no confiables. PRs históricos clasificados y asignados.
+
+
+### 2026-10-23 - Windows repository test portability
+- Objetivo: ejecutar las validaciones actuales de origin/develop en Windows sin cambiar dependencias ni versiones.
+- Cambios: normalización CRLF al extraer el script de PR metadata; invocación del CLI JavaScript de npm desde Node en las pruebas de SemVer; omisión explícita de la prueba de symlink solo ante WinError 1314, manteniendo el rechazo real en CI Linux.
+- Archivos: scripts/pr-metadata.test.cjs, scripts/version.test.cjs, scripts/package_extension_test.py.
+- Validación: npm test con 18 pruebas Node correctas y 2 pruebas Python correctas; 1 prueba Python omitida por privilegio de symlink ausente. Los incrementos de versión se ejercitan en copias temporales.
+- Riesgos pendientes: CI Linux y creación real de symlinks no se ejecutaron en este equipo.
+- Próximo paso: completar la reconciliación de las correcciones runtime y validar el ZIP distribuible.
