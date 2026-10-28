@@ -17,8 +17,8 @@ test('npm release commands synchronize package, lockfile and manifest for each i
     let [major,minor,patch] = require('../package.json').version.split('.').map(Number);
     for (const kind of ['patch','minor','major']) {
       if (kind === 'patch') patch++; else if (kind === 'minor') {minor++;patch=0;} else {major++;minor=0;patch=0;}
-      const npmCli = process.env.npm_execpath || path.join(path.dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js');
-      execFileSync(process.execPath, [npmCli, 'run', `release:${kind}`], {cwd:dir,stdio:'pipe'});
+      const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+      execFileSync(npmCommand, ['run', `release:${kind}`], {cwd:dir,stdio:'pipe'});
       assert.equal(synchronize(dir,true),`${major}.${minor}.${patch}`);
     }
     const file=path.join(dir,'manifest.json'); const m=JSON.parse(fs.readFileSync(file));m.version='0.1.0';fs.writeFileSync(file,JSON.stringify(m));
