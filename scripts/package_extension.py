@@ -9,6 +9,8 @@ ROOT = Path(__file__).resolve().parent.parent
 RUNTIME_FILES = (
     'manifest.json', 'background.js', 'envato-shared.js', 'marketplace-init.js',
     'marketplace-overrides.css', 'image-cache.js', 'removed-items.js', 'content.js',
+    'floating-widget.js', 'floating-widget.css', 'widget-product.js',
+    'assets/icons/widget-menu.svg', 'assets/icons/widget-collapse.svg', 'assets/icons/widget-star.svg',
     'content.css', 'sidepanel.html', 'sidepanel.css', 'sidepanel.js', 'LICENSE',
     'THIRD_PARTY_NOTICES.md', 'assets/fonts/OFL.txt',
     'icons/icon16.png', 'icons/icon48.png', 'icons/icon128.png',

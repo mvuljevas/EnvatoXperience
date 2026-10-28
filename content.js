@@ -170,7 +170,7 @@ function stopPreviewObserver() {
   clearTimeout(previewObserverTimeout);
 }
 
-function openLivePreview(useWidgetMode = false) {
+async function openLivePreview(useWidgetMode = false) {
   try {
     const previewIframe = document.querySelector(
       "iframe.full-screen-preview__frame",
@@ -192,13 +192,10 @@ function openLivePreview(useWidgetMode = false) {
       const targetUrl = previewIframe.src;
       if (isValidUrl(targetUrl)) {
         if (useWidgetMode) {
-          const info = extractProductInfo();
-          info.targetDomain = new URL(targetUrl).hostname;
-          info.timestamp = Date.now();
-
-          chrome.storage.local.set({ activeEnvatoPreview: info }, () => {
-            window.location.href = targetUrl;
-          });
+          const baseInfo = extractProductInfo();
+          const info = await window.EnvatoWidgetProduct.resolve(baseInfo);
+          await chrome.runtime.sendMessage({action:'set_widget_context', info, targetUrl});
+          window.location.href = targetUrl;
         } else {
           window.location.href = targetUrl;
         }
@@ -391,7 +388,8 @@ function extractItemDetails() {
  * Extracts product metadata from the native Envato header
  */
 function extractProductInfo() {
-  const resolvedCurrentItemId = shared ? shared.extractItemIdFromUrl() : "";
+  const canonicalItemUrl = shared?.getCanonicalItemUrl(window.location.href) || '';
+  const resolvedCurrentItemId = shared?.extractItemIdFromUrl(canonicalItemUrl) || '';
   let title = document.title;
   if (title.includes(' - ThemeForest')) title = title.replace(' - ThemeForest', '');
   if (title.includes(' - CodeCanyon')) title = title.replace(' - CodeCanyon', '');
@@ -404,163 +402,67 @@ function extractProductInfo() {
   const buyBtn = document.querySelector('a.buy-btn, a[href*="/checkout/"], a.header-buy-btn, .js-buy-btn');
   if (buyBtn) buyUrl = buyBtn.href;
 
-  let itemUrl = '';
-  if (titleEl && titleEl.href) itemUrl = titleEl.href;
+  const itemUrl = canonicalItemUrl || shared?.getCanonicalItemUrl(titleEl?.href) || '';
 
   const itemId = resolvedCurrentItemId || (shared ? shared.extractItemIdFromUrl(itemUrl) : "");
 
   return { itemId, title, buyUrl, itemUrl };
 }
 
-let widgetContainer = null;
-
-/**
- * Checks if we are on a post-redirect target site and injects the widget
- */
+/** Restore context only on the exact demo hostname, while it is still fresh. */
 function checkAndInjectWidget() {
-  chrome.storage.local.get(['activeEnvatoPreview'], function(result) {
-    if (result.activeEnvatoPreview) {
-      const info = result.activeEnvatoPreview;
-      
-      // Check if context is fresh (e.g. within 2 hours)
-      const age = Date.now() - info.timestamp;
-      const isFresh = Number.isFinite(info.timestamp) && age >= 0 && age < (2 * 60 * 60 * 1000);
-      
-      if (isFresh && window.location.hostname === info.targetDomain) {
-        injectWidget(info);
-      }
+  chrome.runtime.sendMessage({action:'get_widget_context'}).then(info => {
+    if (info) window.EnvatoFloatingWidget?.mount(info);
+  }).catch(() => {});
+}
+
+/** Capture the same metadata used by the panel, including late-loading product images. */
+function observeWidgetProduct() {
+  if (!shared?.getCanonicalItemUrl(window.location.href) || shared.isEnvatoPreviewSite() || location.pathname.includes('/full_screen_preview/')) return;
+  let enabled = false;
+  let lastSnapshot = '';
+  let timer;
+  const capture = () => {
+    if (!enabled) return;
+    const extra = window.EnvatoWidgetProduct.read(document, location.href);
+    const panel = extractItemDetails();
+    const populated = Object.fromEntries(Object.entries(panel).filter(([,value]) => typeof value === 'string' && value !== ''));
+    const product = {...extra, ...populated};
+    const snapshot = JSON.stringify(product);
+    if (!product.itemId || !product.title || snapshot === lastSnapshot) return;
+    lastSnapshot = snapshot;
+    window.EnvatoWidgetProduct.remember(product).catch(() => { lastSnapshot = ''; });
+  };
+  const observer = new MutationObserver(() => { clearTimeout(timer); timer = setTimeout(capture, 150); });
+  const activate = value => {
+    enabled = value;
+    observer.disconnect(); clearTimeout(timer);
+    if (enabled) {
+      lastSnapshot = '';
+      observer.observe(document.body, {childList:true, subtree:true, characterData:true, attributes:true, attributeFilter:['src','srcset','data-src','data-preview-url']});
+      capture();
     }
+  };
+  chrome.storage.sync.get(['widgetMode'], settings => activate(settings.widgetMode === true));
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'sync' && changes.widgetMode) activate(changes.widgetMode.newValue === true);
   });
+  const onPreview = event => {
+    const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+    if (link && link.href.includes('/full_screen_preview/') && shared.getCanonicalItemUrl(link.href) === shared.getCanonicalItemUrl(location.href)) capture();
+  };
+  document.addEventListener('click', onPreview, true);
+  document.addEventListener('auxclick', onPreview, true);
+  document.addEventListener('load', event => { if (event.target instanceof HTMLImageElement) capture(); }, true);
+  window.addEventListener('pagehide', () => { observer.disconnect(); clearTimeout(timer); });
+  window.addEventListener('pageshow', event => { if (event.persisted) activate(enabled); });
 }
 
-/**
- * Injects our own Premium floating widget using Shadow DOM
- */
-function injectWidget(info) {
-  if (widgetContainer) return;
-  
-  widgetContainer = document.createElement("div");
-  widgetContainer.id = "envato-custom-widget-root";
-  const shadow = widgetContainer.attachShadow({ mode: "open" });
-
-  const wrapper = document.createElement("div");
-  const style = document.createElement("style");
-  style.textContent = `
-      :host {
-          position: fixed;
-          bottom: 24px;
-          right: 24px;
-          z-index: 2147483647;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      }
-      .widget-box {
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border-radius: 12px;
-          padding: 16px 20px;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-          border: 1px solid rgba(255, 255, 255, 0.5);
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          animation: slideIn 0.5s ease-out forwards;
-      }
-      @keyframes slideIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-      }
-      .widget-box:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 14px 45px rgba(0, 0, 0, 0.2);
-      }
-      .w-title {
-          font-size: 14px;
-          font-weight: 600;
-          color: #262626;
-          margin: 0;
-          max-width: 250px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-      }
-      .w-actions {
-          display: flex;
-          gap: 8px;
-      }
-      .w-btn {
-          text-decoration: none;
-          font-size: 13px;
-          font-weight: 600;
-          padding: 10px 14px;
-          border-radius: 8px;
-          cursor: pointer;
-          text-align: center;
-          transition: all 0.2s;
-          flex: 1;
-          box-sizing: border-box;
-      }
-      .w-btn-buy {
-          background: #82b641;
-          color: white;
-          box-shadow: 0 4px 10px rgba(130, 182, 65, 0.3);
-      }
-      .w-btn-buy:hover {
-          background: #6fab35;
-          transform: translateY(-1px);
-          box-shadow: 0 6px 15px rgba(130, 182, 65, 0.4);
-      }
-      .w-btn-back {
-          background: rgba(0,0,0,0.06);
-          color: #495057;
-      }
-      .w-btn-back:hover {
-          background: rgba(0,0,0,0.1);
-          color: #262626;
-      }
-  `;
-
-  const widgetBox = document.createElement("div");
-  widgetBox.className = "widget-box";
-
-  const title = document.createElement("p");
-  title.className = "w-title";
-  title.textContent = info.title || "Envato Product";
-  title.title = info.title || "Envato Product";
-  widgetBox.appendChild(title);
-
-  const actions = document.createElement("div");
-  actions.className = "w-actions";
-
-  if (isValidUrl(info.itemUrl)) {
-    const detailsLink = document.createElement("a");
-    detailsLink.className = "w-btn w-btn-back";
-    detailsLink.href = info.itemUrl;
-    detailsLink.textContent = "Details";
-    actions.appendChild(detailsLink);
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'sync' && changes.widgetMode?.newValue === false) {
+    window.EnvatoFloatingWidget?.unmount();
   }
-
-  if (isValidUrl(info.buyUrl)) {
-    const buyLink = document.createElement("a");
-    buyLink.className = "w-btn w-btn-buy";
-    buyLink.href = info.buyUrl;
-    buyLink.target = "_blank";
-    buyLink.rel = "noopener noreferrer";
-    buyLink.textContent = "Buy Now";
-    actions.appendChild(buyLink);
-  }
-
-  if (actions.childElementCount > 0) {
-    widgetBox.appendChild(actions);
-  }
-
-  wrapper.appendChild(style);
-  wrapper.appendChild(widgetBox);
-
-  shadow.appendChild(wrapper);
-  document.body.appendChild(widgetContainer);
-}
+});
 
 /**
  * Initialize the script
@@ -569,6 +471,7 @@ function initialize() {
   if (window !== window.top) return; // Prevent execution inside iframes
 
   installTestBridge();
+  observeWidgetProduct();
 
   chrome.storage.sync.get(["autoRemove", "widgetMode"], function (result) {
     const autoRemoveEnabled = result.autoRemove !== false; // Default to true if undefined

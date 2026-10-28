@@ -33,6 +33,7 @@ function contentRuntime() {
   let disconnected = false;
   const destination = { hostname: 'demo.example', href: '' };
   const window = { location: destination, addEventListener() {} };
+  window.EnvatoFloatingWidget = { mount() {} };
   window.top = window;
   const document = {
     documentElement: {},
@@ -42,8 +43,8 @@ function contentRuntime() {
   const context = vm.createContext({
     window, document, URL, console,
     chrome: {
-      runtime: { onMessage: { addListener() {} } },
-      storage: { sync: { get() {} } },
+      runtime: { onMessage: { addListener() {} }, sendMessage: () => Promise.resolve(null) },
+      storage: { onChanged: { addListener() {} }, sync: { get() {} } },
     },
     MutationObserver: class {
       constructor(callback) { observerCallback = callback; }
@@ -68,21 +69,22 @@ test('auto remove waits for a late iframe and its src, then disconnects', () => 
   assert.equal(runtime.disconnected(), true);
 });
 
-test('widget context requires exact destination and a valid fresh timestamp', () => {
+test('widget injection requests tab-scoped context from the trusted worker', async () => {
   const runtime = contentRuntime();
-  let injected = 0;
-  runtime.context.injectWidget = () => injected++;
-  for (const [hostname, timestamp, expected] of [
-    ['demo.example', Date.now(), 1],
-    ['demo.example.evil.test', Date.now(), 0],
-    ['notdemo.example', Date.now(), 0],
-    ['demo.example', Date.now() - 3 * 60 * 60 * 1000, 0],
-    ['demo.example', Date.now() + 60000, 0],
-  ]) {
-    injected = 0;
-    runtime.destination.hostname = hostname;
-    runtime.context.chrome.storage.local = { get: (_, callback) => callback({ activeEnvatoPreview: { targetDomain: 'demo.example', timestamp } }) };
-    vm.runInContext('checkAndInjectWidget()', runtime.context);
-    assert.equal(injected, expected);
-  }
+  const requests = [];
+  let mounted = 0;
+  runtime.context.window.EnvatoFloatingWidget.mount = () => mounted++;
+  runtime.context.chrome.runtime.sendMessage = (message) => {
+    requests.push(message.action);
+    return Promise.resolve({itemId:'123'});
+  };
+  vm.runInContext('checkAndInjectWidget()', runtime.context);
+  await Promise.resolve();
+  assert.deepEqual(requests, ['get_widget_context']);
+  assert.equal(mounted, 1);
+  runtime.context.chrome.runtime.sendMessage = () => Promise.resolve(null);
+  mounted = 0;
+  vm.runInContext('checkAndInjectWidget()', runtime.context);
+  await Promise.resolve();
+  assert.equal(mounted, 0);
 });

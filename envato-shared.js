@@ -48,8 +48,19 @@
       return "";
     }
 
-    const match = url.match(/\/item\/[^/]+\/(?:(?:reviews|comments|support)\/)?(\d+)(?:[/?#]|$)/i);
+    const match = url.match(/\/item\/[^/]+\/(?:(?:reviews|comments|support|full_screen_preview)\/)?(\d+)(?:[/?#]|$)/i);
     return match ? match[1] : "";
+  }
+
+  function getCanonicalItemUrl(input = global.location?.href || '') {
+    try {
+      const url = new URL(input);
+      const host = url.hostname.replace(/^(preview\.|www\.)/, '');
+      if (!MARKETPLACE_HOSTS.includes(host) || url.username || url.password || url.port || !['http:', 'https:'].includes(url.protocol)) return '';
+      const itemId = extractItemIdFromUrl(url.pathname);
+      const slug = url.pathname.match(/^\/item\/([^/]+)\//)?.[1];
+      return itemId && slug ? `https://${host}/item/${slug}/${itemId}` : '';
+    } catch (_) { return ''; }
   }
 
   function getSiteName(url = "") {
@@ -89,6 +100,7 @@
     MARKETPLACE_HOSTS,
     PREVIEW_HOSTS,
     extractItemIdFromUrl,
+    getCanonicalItemUrl,
     getSiteName,
     isEnvatoMarketplaceSite,
     isEnvatoPreviewSite,
@@ -96,4 +108,4 @@
     readHideDeprecatedPreference,
     hasLegacyHideAdsPreference,
   });
-})(window);
+})(typeof window !== 'undefined' ? window : globalThis);

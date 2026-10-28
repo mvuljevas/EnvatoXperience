@@ -44,7 +44,7 @@
     },
     {
       "matches": ["<all_urls>"],
-      "js": ["envato-shared.js", "image-cache.js", "removed-items.js", "content.js"],
+      "js": ["envato-shared.js", "image-cache.js", "removed-items.js", "widget-product.js", "floating-widget.js", "content.js"],
       "run_at": "document_idle"
     }
   ],
@@ -60,6 +60,7 @@
         "image-cache.js",
         "marketplace-overrides.css",
         "content.css",
+        "floating-widget.css",
         "assets/fonts/*",
         "assets/images/*",
         "assets/icons/*"

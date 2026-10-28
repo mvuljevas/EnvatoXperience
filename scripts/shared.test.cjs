@@ -11,3 +11,11 @@ test('marketplace matching accepts real hosts and rejects lookalikes and URL bai
   assert.equal(shared.isEnvatoPreviewSite('https://themeforest.net/preview.themeforest.net'), false);
   assert.equal(shared.isEnvatoPreviewSite('https://preview.themeforest.net/item/test/123'), true);
 });
+
+test('canonical item URLs survive real preview routes without relying on header classes', () => {
+  const preview='https://preview.themeforest.net/item/atomik/full_screen_preview/65057834?ref=test';
+  assert.equal(shared.extractItemIdFromUrl(preview),'65057834');
+  assert.equal(shared.getCanonicalItemUrl(preview),'https://themeforest.net/item/atomik/65057834');
+  assert.equal(shared.getCanonicalItemUrl('https://themeforest.net/item/atomik/65057834/reviews'),'https://themeforest.net/item/atomik/65057834');
+  assert.equal(shared.getCanonicalItemUrl('https://themeforest.net.attacker.test/item/test/123'),'');
+});
